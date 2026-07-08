@@ -1,17 +1,39 @@
-#AUTO;MTX=2;MTY=2;EN
-#BEGIN;yCnt=800;xCnt=1000;DMData[11];JS#fill("Data",0)
-#DATA_WT
-#LOOP;WT100;begin=Data[0];JP#LOOP,begin=0;JP#STOP,begin=2;JS#PRINT;Data[0]=0
-JP#DATA_WT
-#STOP;SPX=60*xCnt;SPY=40*yCnt;PAX=150*xCnt;PAY=0;BGXY;AM;EN
-#PRINT;strtX=Data[1];strtY=Data[2];numLs=Data[3];lSpce=Data[4];lDist=Data[5]
-dSpce=Data[6];jetHz=Data[7];pVelc=Data[8];pAccl=Data[9];index=Data[10]
-ACX =pAccl;DCX =pAccl;ACY =400*yCnt;DCY =400*yCnt;SHH;ACH =1073740800
-DCH =1073740800;accT=pVelc/pAccl;accD =accT*accT*pAccl*0.5;jOffD =accD +lDist
-#PRNTL;SPX=80*xCnt;SPY=60*yCnt;PAX=(strtX-accD);PAY=strtY;BGXY;AM;WT100
-SPX=pVelc;JGH=jetHz;PRX=lDist+(2.0*accD);BGX;ADX=accD;BGH;ADX=jOffD;STH;AM
-strtY=strtY+lSpce;index=index+1;JP#PRNTL,index<numLs;EN
-#fill;^c=0
-#fill_h;^a[^c]=^b;^c=^c+1;JP#fill_h,(^c<^a[-1]);EN
+; ============================================================================
+; program.dmc — DMC-4080 startup program for the inkjet test rig
+;
+; This file is downloaded to the controller's non-volatile memory.  To update
+; it, connect with Galil Composer (or telnet) and use:
+;
+;   gprogramdownload  (gclib call)   — from the GUI's "Upload Program" button
+;   RS              — hardware reset the controller
+;
+; ── What this program does ────────────────────────────────────────────────────
+;   #AUTO runs automatically at power-up.  It:
+;     1. Configures the stepper motor type for both active axes.
+;     2. Enables both motors so they hold position immediately on power-up.
+;
+;   All motion, jetting, and solenoid control is commanded from the GUI;
+;   no stored motion programs are used at runtime.
+;
+; ── Axes ─────────────────────────────────────────────────────────────────────
+;   A (alias X) — X-axis carriage    FUYU FSL30 linear stage + Nema 14 stepper
+;   D           — Reservoir height   Shorter version of the same FSL30 stage
+;
+;   MT=2 : Stepper motor, active-low step pulse (standard for FSL30 + driver)
+;
+; ── Motor enable at startup ───────────────────────────────────────────────────
+;   SHA and SHD energise the steppers so the carriage does not drift when the
+;   controller boots.  If you prefer to enable motors manually from the GUI,
+;   comment these two lines out.
+;
+; ── Unused axes ──────────────────────────────────────────────────────────────
+;   B, C, E, F, G, H are not wired up.  Do not send SH or motion commands
+;   to them; the controller will report an error.
+; ============================================================================
 
-␦:
+#AUTO
+MTA=2   ; Axis A (X carriage): stepper, active-low step
+MTD=2   ; Axis D (reservoir):  stepper, active-low step
+SHA     ; Enable X-axis motor on boot
+SHD     ; Enable D-axis motor on boot
+EN
