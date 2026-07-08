@@ -14,7 +14,10 @@ GalilController::GalilController(QObject *parent)
     : QObject(parent)
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &GalilController::pollStatus);
+    QObject::connect(m_pollTimer,
+                     &QTimer::timeout,
+                     this,
+                     &GalilController::pollStatus);
 }
 
 GalilController::~GalilController()
