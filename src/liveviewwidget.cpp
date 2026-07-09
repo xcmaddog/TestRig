@@ -1,4 +1,4 @@
-#include "LiveViewWidget.h"
+#include "liveviewwidget.h"
 
 #include <QPainter>
 #include <QPaintEvent>
