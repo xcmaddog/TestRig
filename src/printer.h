@@ -36,17 +36,9 @@ enum class Axis { X, D };
 #define D_CNTS_PER_MM 25600.0   // same hardware as X for now
 
 // ── Digital output bit numbers ──────────────────────────────────────────────
-// Solenoid valve — two options depending on which output works in practice:
-//   SOLENOID_DO1_BIT   : high-power optoisolated output DO1 (first attempt)
-//   SOLENOID_EXTIO_BIT : extended I/O bit 30 (fallback, same as the custom
-//                        printer once DO1 proved unreliable there)
 // Set the active bit in GalilController::quickPurge() and setSolenoid().
-//
-// TODO: confirm DO1 bit number from the DMC-4080 manual / Galil Wiring Doc.
-//       For most DMC-4080 configs, DO1 = bit 1 on the high-power connector.
 
-#define SOLENOID_DO1_BIT   1
-#define SOLENOID_EXTIO_BIT 30
+#define SOLENOID_BIT 22
 
 // JetForge (Added Scientific) trigger bits — verified against custom printer
 // wiring; recheck if the test-rig Galil extension I/O is wired differently.
@@ -206,7 +198,7 @@ inline std::string clear_bit(int bit)
 // Quick-purge pulse: arms the solenoid for pulseTime_ms milliseconds.
 // Uses the high-power DO1 output by default; change the bit to
 // SOLENOID_EXTIO_BIT if DO1 proves unreliable.
-inline std::string quick_purge(int pulseTime_ms, int bit = SOLENOID_DO1_BIT)
+inline std::string quick_purge(int pulseTime_ms, int bit = SOLENOID_BIT)
 {
     std::stringstream s;
     s << set_bit(bit);
