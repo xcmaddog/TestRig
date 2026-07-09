@@ -196,14 +196,12 @@ inline std::string clear_bit(int bit)
 // ── Solenoid / purge helpers ─────────────────────────────────────────────────
 
 // Quick-purge pulse: arms the solenoid for pulseTime_ms milliseconds.
-// Uses the high-power DO1 output by default; change the bit to
-// SOLENOID_EXTIO_BIT if DO1 proves unreliable.
-inline std::string quick_purge(int pulseTime_ms, int bit = SOLENOID_BIT)
+inline std::string quick_purge(int pulseTime_ms)
 {
     std::stringstream s;
-    s << set_bit(bit);
+    s << set_bit(SOLENOID_BIT);
     s << sleep(pulseTime_ms);
-    s << clear_bit(bit);
+    s << clear_bit(SOLENOID_BIT);
     return s.str();
 }
 
