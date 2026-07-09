@@ -221,7 +221,7 @@ bool GalilController::stopMotion(Axis axis)
 
 bool GalilController::abortMotion()
 {
-    return sendCommand("AB");
+    return sendCommand(QStringLiteral("AB"));
 }
 
 bool GalilController::definePositionZero(Axis axis)
