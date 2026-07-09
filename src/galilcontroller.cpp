@@ -286,21 +286,19 @@ bool GalilController::downloadAndRun(const std::string &dmcProgram)
 // Solenoid
 // ---------------------------------------------------------------------------
 
-bool GalilController::setSolenoid(bool on, bool useExtIO)
+bool GalilController::setSolenoid(bool on)
 {
-    int bit = useExtIO ? SOLENOID_EXTIO_BIT : SOLENOID_DO1_BIT;
-    return sendCommand(on ? QString("SB %1").arg(bit)
-                           : QString("CB %1").arg(bit));
+    return sendCommand(on ? QString("SB %1").arg(SOLENOID_BIT)
+                           : QString("CB %1").arg(SOLENOID_BIT));
 }
 
-bool GalilController::quickPurse(int pulseMs, bool useExtIO)
+bool GalilController::quickPurge(int pulseMs)
 {
-    int bit = useExtIO ? SOLENOID_EXTIO_BIT : SOLENOID_DO1_BIT;
     // Build a tiny DMC program:  SB → WT → CB
     std::stringstream s;
-    s << CMD::set_bit(bit);
+    s << CMD::set_bit(SOLENOID_BIT);
     s << CMD::sleep(pulseMs);
-    s << CMD::clear_bit(bit);
+    s << CMD::clear_bit(SOLENOID_BIT);
     return downloadAndRun(CMD::cmd_buf_to_dmc(s));
 }
 

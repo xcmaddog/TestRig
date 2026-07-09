@@ -23,6 +23,7 @@ qrc_*.cpp
 # IDEs
 .vscode/
 .idea/
+.qtcreator/
 
 # OS junk
 .DS_Store
