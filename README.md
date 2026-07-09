@@ -238,23 +238,12 @@ The **strobe Teensy** goes in the **Camera/Strobe tab** Teensy Connection sectio
 
 ## Solenoid valve wiring
 
-The quick-purge solenoid is controlled by a Galil digital output.  Two
-options are supported:
+The quick-purge solenoid is controlled by a Galil digital output.
 
-| Option | Bit | Notes |
-|--------|-----|-------|
-| **DO1** (try first) | `SOLENOID_DO1_BIT = 1` | Galil high-power optoisolated output |
-| **Extended I/O** (fallback) | `SOLENOID_EXTIO_BIT = 30` | Requires external MOSFET circuit, same as the custom printer |
-
-If DO1 does not actuate the solenoid, check the **"Use extended I/O"**
-checkbox in the Quick Purge panel and wire up the MOSFET circuit to extended
-I/O bit 30.
-
-To change the bit numbers, edit the `#define` values in `src/printer.h`:
+To change the bit number, edit the `#define` value in `src/printer.h`:
 
 ```cpp
-#define SOLENOID_DO1_BIT   1
-#define SOLENOID_EXTIO_BIT 30
+#define SOLENOID_BIT   22
 ```
 
 ---
