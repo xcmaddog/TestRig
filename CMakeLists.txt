@@ -142,12 +142,6 @@ install(TARGETS TestRig
 )
 
 # ── Runtime library paths ─────────────────────────────────────────────────────
-if(HAS_IDS_PEAK)
-    set_target_properties(TestRig PROPERTIES
-        BUILD_RPATH "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64/lib/aarch64-linux-gnu"
-    )
-endif()
-
 set_target_properties(TestRig PROPERTIES
     BUILD_RPATH "${IDS_PEAK_LIB_DIR}"
 )
