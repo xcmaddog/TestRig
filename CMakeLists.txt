@@ -13,44 +13,86 @@ find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets SerialPort)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets SerialPort)
 
 # ── gclib ─────────────────────────────────────────────────────────────────────
-# gclib is installed system-wide via the Galil APT repo.
-# Typical install locations on ARM64 Debian:
+# Linux (e.g. Raspberry Pi): installed system-wide via the Galil APT repo.
 #   Headers : /usr/include/gclib.h  /usr/include/gclibo.h
 #   Library : /usr/lib/libgclib.so
 #
-# If gclib was installed somewhere else, override with:
-#   cmake -DGCLIB_INCLUDE_DIR=/path/to/include -DGCLIB_LIB=/path/to/libgclib.so ..
+# Windows: installed by the Galil gclib installer.
+#   Headers : C:/Program Files/Galil/gclib/include
+#   Library : C:/Program Files/Galil/gclib/dll (gclib.lib / gclibo.lib import libs,
+#             built for MSVC; matching gclib.dll/gclibo.dll must be on PATH
+#             at runtime, which you've already done)
+#
+# Override on either platform with:
+#   cmake -DGCLIB_ROOT=/path/to/gclib ..
 
-find_path(GCLIB_INCLUDE_DIR gclib.h
-    PATHS /usr/include /usr/local/include
-    REQUIRED
-)
+if(WIN32)
+    set(GCLIB_ROOT "C:/Program Files/Galil/gclib" CACHE PATH "gclib root")
 
-find_library(GCLIB_LIB
-    NAMES gclib
-    PATHS /usr/lib /usr/local/lib /usr/lib/aarch64-linux-gnu
-    REQUIRED
-)
+    find_path(GCLIB_INCLUDE_DIR gclib.h
+        PATHS "${GCLIB_ROOT}/include"
+        REQUIRED
+    )
 
-find_library(GCLIBO_LIB
-    NAMES gclibo
-    PATHS /usr/lib /usr/local/lib /usr/lib/aarch64-linux-gnu
-    REQUIRED
-)
+    find_library(GCLIB_LIB
+        NAMES gclib
+        PATHS "${GCLIB_ROOT}/dll" "${GCLIB_ROOT}/lib"
+        REQUIRED
+    )
+
+    find_library(GCLIBO_LIB
+        NAMES gclibo
+        PATHS "${GCLIB_ROOT}/dll" "${GCLIB_ROOT}/lib"
+        REQUIRED
+    )
+else()
+    find_path(GCLIB_INCLUDE_DIR gclib.h
+        PATHS /usr/include /usr/local/include
+        REQUIRED
+    )
+
+    find_library(GCLIB_LIB
+        NAMES gclib
+        PATHS /usr/lib /usr/local/lib /usr/lib/aarch64-linux-gnu
+        REQUIRED
+    )
+
+    find_library(GCLIBO_LIB
+        NAMES gclibo
+        PATHS /usr/lib /usr/local/lib /usr/lib/aarch64-linux-gnu
+        REQUIRED
+    )
+endif()
 
 # ── IDS peak SDK ─────────────────────────────────────────────────────────────
+# Windows default install path is IDS's standard SDK location; override with:
+#   cmake -DIDS_PEAK_ROOT=/your/path ..
 
-set(IDS_PEAK_ROOT "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64"
-    CACHE PATH "IDS peak SDK root")
+if(WIN32)
+    set(IDS_PEAK_ROOT "C:/Program Files/IDS/ids_peak"
+        CACHE PATH "IDS peak SDK root")
 
-set(IDS_PEAK_INCLUDE_DIR
-    "${IDS_PEAK_ROOT}/include/ids-peak")
+    set(IDS_PEAK_INCLUDE_DIR
+        "${IDS_PEAK_ROOT}/generic_sdk/api/include/ids-peak")
 
-set(IDS_PEAK_COMMON_INCLUDE_DIR
-    "${IDS_PEAK_ROOT}/include")
+    set(IDS_PEAK_COMMON_INCLUDE_DIR
+        "${IDS_PEAK_ROOT}/generic_sdk/api/include")
 
-set(IDS_PEAK_LIB_DIR
-    "${IDS_PEAK_ROOT}/lib/aarch64-linux-gnu")
+    set(IDS_PEAK_LIB_DIR
+        "${IDS_PEAK_ROOT}/generic_sdk/api/lib/x86_64")
+else()
+    set(IDS_PEAK_ROOT "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64"
+        CACHE PATH "IDS peak SDK root")
+
+    set(IDS_PEAK_INCLUDE_DIR
+        "${IDS_PEAK_ROOT}/include/ids-peak")
+
+    set(IDS_PEAK_COMMON_INCLUDE_DIR
+        "${IDS_PEAK_ROOT}/include")
+
+    set(IDS_PEAK_LIB_DIR
+        "${IDS_PEAK_ROOT}/lib/aarch64-linux-gnu")
+endif()
 
 find_path(IDS_PEAK_HEADER
     peak/peak.hpp
@@ -150,8 +192,24 @@ install(TARGETS TestRig
 )
 
 # ── Runtime library paths ─────────────────────────────────────────────────────
-set_target_properties(TestRig PROPERTIES
-    BUILD_RPATH "${IDS_PEAK_LIB_DIR}"
-)
+if(WIN32)
+    # Windows has no rpath concept; the required DLLs (gclib.dll, gclibo.dll,
+    # ids_peak.dll, ids_peak_ipl.dll, and the Qt DLLs) must be next to the .exe
+    # or on PATH. Since gclib's bin dir is already on your PATH, gclib should
+    # resolve at runtime. Copy the IDS peak DLLs next to the executable so it
+    # runs without extra PATH edits:
+    file(GLOB IDS_PEAK_DLLS "${IDS_PEAK_LIB_DIR}/*.dll")
+    if(IDS_PEAK_DLLS)
+        add_custom_command(TARGET TestRig POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${IDS_PEAK_DLLS} $<TARGET_FILE_DIR:TestRig>
+            COMMENT "Copying IDS peak DLLs next to TestRig.exe"
+        )
+    endif()
+else()
+    set_target_properties(TestRig PROPERTIES
+        BUILD_RPATH "${IDS_PEAK_LIB_DIR}"
+    )
+endif()
 
 qt_finalize_executable(TestRig)
