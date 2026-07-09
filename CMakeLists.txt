@@ -75,11 +75,18 @@ if(WIN32)
     set(IDS_PEAK_INCLUDE_DIR
         "${IDS_PEAK_ROOT}/generic_sdk/api/include")
 
+    set(IDS_PEAK_COMMON_INCLUDE_DIR
+        "${IDS_PEAK_ROOT}/common/include")
+
     set(IDS_PEAK_IPL_LIB_DIR
         "${IDS_PEAK_ROOT}/generic_sdk/ipl/lib/x86_64")
 
     set(IDS_PEAK_LIB_DIR
         "${IDS_PEAK_ROOT}/generic_sdk/api/lib/x86_64")
+
+    set(IDS_PEAK_IPL_INCLUDE_DIR
+        "${IDS_PEAK_ROOT}/generic_sdk/ipl/include")
+
 else()
     set(IDS_PEAK_ROOT "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64"
         CACHE PATH "IDS peak SDK root")
@@ -170,6 +177,7 @@ target_include_directories(TestRig PRIVATE
 target_include_directories(TestRig PRIVATE
     "${IDS_PEAK_INCLUDE_DIR}"
     "${IDS_PEAK_COMMON_INCLUDE_DIR}"
+    "${IDS_PEAK_IPL_INCLUDE_DIR}"
 )
 
 # ── Link libraries ────────────────────────────────────────────────────────────
