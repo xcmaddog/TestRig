@@ -97,12 +97,9 @@ public:
     // setSolenoid: turns a digital output on (SB) or off (CB).
     // quickPurge:  downloads a DMC program that does SB → WT(ms) → CB,
     //              so the pulse timing is handled on the controller.
-    //
-    // useExtIO: if true, uses SOLENOID_EXTIO_BIT (extended I/O bit 30);
-    //           if false, uses SOLENOID_DO1_BIT (high-power output DO1).
 
-    bool setSolenoid(bool on, bool useExtIO = false);
-    bool quickPurge(int pulseMs, bool useExtIO = false);
+    bool setSolenoid(bool on);
+    bool quickPurge(int pulseMs);
 
     // ── Raw command interface ────────────────────────────────────────────
     //

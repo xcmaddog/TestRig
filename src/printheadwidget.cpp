@@ -238,13 +238,6 @@ void PrintheadWidget::buildUI()
         m_purgeMsSpin->setToolTip("How long to open the solenoid valve.");
         form->addRow("Pulse duration:", m_purgeMsSpin);
 
-        m_useExtIOCheck = new QCheckBox("Use extended I/O (bit 30) instead of DO1", this);
-        m_useExtIOCheck->setToolTip(
-            "Check this if the DO1 high-power output doesn't work.\n"
-            "Requires a MOSFET circuit on extended I/O bit 30\n"
-            "(same wiring as the custom printer).");
-        form->addRow(m_useExtIOCheck);
-
         m_quickPurgeBtn = new QPushButton("Open Solenoid", this);
         m_quickPurgeBtn->setMinimumHeight(32);
         form->addRow(m_quickPurgeBtn);
@@ -550,12 +543,11 @@ void PrintheadWidget::quickPurgePressed()
         writeToResponseWindow("Galil not connected — cannot operate solenoid.");
         return;
     }
-    bool useExtIO = m_useExtIOCheck->isChecked();
     int  pulseMs  = m_purgeMsSpin->value();
-    m_galil->quickPurse(pulseMs, useExtIO);
-    writeToResponseWindow(QString("Quick purge: %1 ms pulse on %2.")
+    m_galil->quickPurge(pulseMs);
+    writeToResponseWindow(QString("Quick purge: %1 ms pulse on I/O %2.")
                               .arg(pulseMs)
-                              .arg(useExtIO ? "extended I/O bit 30" : "DO1"));
+                              .arg(SOLENOID_BIT));
 }
 
 // ---------------------------------------------------------------------------

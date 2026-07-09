@@ -262,7 +262,8 @@ bool GalilController::downloadAndRun(const std::string &dmcProgram)
     }
 
     // Abort any running program / motion before downloading.
-    GCommand(m_handle, "AB", nullptr, 0, nullptr);
+    char buf[BUF_SIZE] = {};
+    GCommand(m_handle, "AB", buf, sizeof(buf), nullptr);
 
     GReturn rc = GProgramDownload(m_handle, dmcProgram.c_str(), "");
     if (rc != G_NO_ERROR)
@@ -271,7 +272,7 @@ bool GalilController::downloadAndRun(const std::string &dmcProgram)
         return false;
     }
 
-    rc = GCommand(m_handle, "XQ", nullptr, 0, nullptr);
+    rc = GCommand(m_handle, "XQ", buf, sizeof(buf), nullptr);
     if (rc != G_NO_ERROR)
     {
         emitError("XQ", rc);

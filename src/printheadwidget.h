@@ -159,7 +159,6 @@ private:
     // Quick purge (solenoid)
     QPushButton    *m_quickPurgeBtn  = nullptr;
     QSpinBox       *m_purgeMsSpin    = nullptr;   // pulse duration ms
-    QCheckBox      *m_useExtIOCheck  = nullptr;   // use ext I/O bit instead of DO1
 
     // X-axis motion
     QPushButton    *m_xRightBtn      = nullptr;

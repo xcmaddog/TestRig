@@ -42,8 +42,8 @@ enum class Axis { X, D };
 
 // JetForge (Added Scientific) trigger bits — verified against custom printer
 // wiring; recheck if the test-rig Galil extension I/O is wired differently.
-#define MJ_START_BIT  23   // pin 18 on the custom printer
-#define MJ_DIR_BIT    22   // pin 32 on the custom printer
+#define MJ_START_BIT  18   // pin 18 on the custom printer
+#define MJ_DIR_BIT    32   // pin 32 on the custom printer
 
 // ── CMD namespace ────────────────────────────────────────────────────────────
 // Builds Galil DMC program strings.  Each function returns a single line in
@@ -196,14 +196,12 @@ inline std::string clear_bit(int bit)
 // ── Solenoid / purge helpers ─────────────────────────────────────────────────
 
 // Quick-purge pulse: arms the solenoid for pulseTime_ms milliseconds.
-// Uses the high-power DO1 output by default; change the bit to
-// SOLENOID_EXTIO_BIT if DO1 proves unreliable.
-inline std::string quick_purge(int pulseTime_ms, int bit = SOLENOID_BIT)
+inline std::string quick_purge(int pulseTime_ms)
 {
     std::stringstream s;
-    s << set_bit(bit);
+    s << set_bit(SOLENOID_BIT);
     s << sleep(pulseTime_ms);
-    s << clear_bit(bit);
+    s << clear_bit(SOLENOID_BIT);
     return s.str();
 }
 

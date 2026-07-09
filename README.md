@@ -2,7 +2,7 @@
 
 Qt6/C++ GUI for the inkjet test rig.  Runs on a Raspberry Pi connected to a
 **Galil DMC-4080-C022** motion controller and a **JetForge** (Added Scientific)
-Xaar printhead controller, with optional stroboscopic imaging via an
+Xaar printhead controller, with stroboscopic imaging via an
 **IDS UI-3370CP** camera and a **Teensy 4.0** strobe driver.
 
 ---
@@ -13,8 +13,8 @@ Xaar printhead controller, with optional stroboscopic imaging via an
 |-----------|-----------|-------|
 | Galil DMC-4080-C022 | Ethernet (192.168.42.x) | Axes A (X carriage) and D (reservoir height) |
 | JetForge (Added Scientific) | USB serial | Xaar 128-nozzle printhead controller |
-| Air solenoid valve | Galil DO1 or extended I/O bit 30 | Quick purge |
-| IDS UI-3370CP camera | USB3 | Stroboscopic imaging (optional) |
+| Air solenoid valve | Galil extended I/O bit 22 | Quick purge |
+| IDS UI-3370CP camera | USB3 | Stroboscopic imaging |
 | Strobe Teensy 4.0 | USB serial | Custom PCB; firmware in `Teensy/` |
 
 ---
@@ -124,9 +124,6 @@ and the manual step is no longer needed.
 
 ### 6 — Install IDS peak (optional — camera support)
 
-Skip this section if you are not using the IDS camera.  The GUI compiles and
-runs without IDS peak; the Camera tab reports "camera unavailable" at runtime.
-
 Download the IDS peak installer for **Linux ARM64** from
 https://en.ids-imaging.com/ids-peak.html.
 
@@ -161,12 +158,6 @@ ninja
 
 The resulting binary is `build/TestRig`.
 
-To build **without** IDS peak (camera stub only):
-
-```bash
-cmake .. -DWITH_IDS_PEAK=OFF -G Ninja
-ninja
-```
 
 ### 8 — Upload program.dmc to the controller
 
@@ -238,23 +229,12 @@ The **strobe Teensy** goes in the **Camera/Strobe tab** Teensy Connection sectio
 
 ## Solenoid valve wiring
 
-The quick-purge solenoid is controlled by a Galil digital output.  Two
-options are supported:
+The quick-purge solenoid is controlled by a Galil digital output.
 
-| Option | Bit | Notes |
-|--------|-----|-------|
-| **DO1** (try first) | `SOLENOID_DO1_BIT = 1` | Galil high-power optoisolated output |
-| **Extended I/O** (fallback) | `SOLENOID_EXTIO_BIT = 30` | Requires external MOSFET circuit, same as the custom printer |
-
-If DO1 does not actuate the solenoid, check the **"Use extended I/O"**
-checkbox in the Quick Purge panel and wire up the MOSFET circuit to extended
-I/O bit 30.
-
-To change the bit numbers, edit the `#define` values in `src/printer.h`:
+To change the bit number, edit the `#define` value in `src/printer.h`:
 
 ```cpp
-#define SOLENOID_DO1_BIT   1
-#define SOLENOID_EXTIO_BIT 30
+#define SOLENOID_BIT   22
 ```
 
 ---
@@ -262,12 +242,12 @@ To change the bit numbers, edit the `#define` values in `src/printer.h`:
 ## JetForge / MJ_START and MJ_DIR bits
 
 The JetForge receives a print-start trigger and a direction signal from the
-Galil's extended I/O.  The default bit assignments (matching the custom
-printer's wiring) are in `src/printer.h`:
+Galil's extended I/O.  The default bit assignments (which may need to be 
+changed) are in `src/printer.h`:
 
 ```cpp
-#define MJ_START_BIT  23   // pin 18
-#define MJ_DIR_BIT    22   // pin 32
+#define MJ_START_BIT  18   // pin 18
+#define MJ_DIR_BIT    32   // pin 32
 ```
 
 **Verify these against the test rig's actual wiring before the first print
