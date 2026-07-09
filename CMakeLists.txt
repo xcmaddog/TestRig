@@ -73,10 +73,10 @@ if(WIN32)
         CACHE PATH "IDS peak SDK root")
 
     set(IDS_PEAK_INCLUDE_DIR
-        "${IDS_PEAK_ROOT}/generic_sdk/api/include/ids-peak")
-
-    set(IDS_PEAK_COMMON_INCLUDE_DIR
         "${IDS_PEAK_ROOT}/generic_sdk/api/include")
+
+    set(IDS_PEAK_IPL_LIB_DIR
+        "${IDS_PEAK_ROOT}/generic_sdk/ipl/lib/x86_64")
 
     set(IDS_PEAK_LIB_DIR
         "${IDS_PEAK_ROOT}/generic_sdk/api/lib/x86_64")
@@ -108,7 +108,7 @@ find_library(IDS_PEAK_LIB
 
 find_library(IDS_PEAK_IPL_LIB
     NAMES ids_peak_ipl
-    PATHS "${IDS_PEAK_LIB_DIR}"
+    PATHS "${IDS_PEAK_IPL_LIB_DIR}"
     REQUIRED
 )
 
