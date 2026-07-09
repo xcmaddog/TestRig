@@ -25,8 +25,15 @@ find_path(GCLIB_INCLUDE_DIR gclib.h
     PATHS /usr/include /usr/local/include
     REQUIRED
 )
+
 find_library(GCLIB_LIB
     NAMES gclib
+    PATHS /usr/lib /usr/local/lib /usr/lib/aarch64-linux-gnu
+    REQUIRED
+)
+
+find_library(GCLIBO_LIB
+    NAMES gclibo
     PATHS /usr/lib /usr/local/lib /usr/lib/aarch64-linux-gnu
     REQUIRED
 )
@@ -128,6 +135,7 @@ target_link_libraries(TestRig PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::SerialPort
     "${GCLIB_LIB}"
+    "${GCLIBO_LIB}"
 )
 
 target_link_libraries(TestRig PRIVATE
