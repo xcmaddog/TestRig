@@ -545,7 +545,7 @@ void PrintheadWidget::quickPurgePressed()
     }
     int  pulseMs  = m_purgeMsSpin->value();
     m_galil->quickPurge(pulseMs);
-    writeToResponseWindow(QString("Quick purge: %1 ms pulse on %2.")
+    writeToResponseWindow(QString("Quick purge: %1 ms pulse on I/O %2.")
                               .arg(pulseMs)
                               .arg(SOLENOID_BIT));
 }
