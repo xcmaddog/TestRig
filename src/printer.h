@@ -42,8 +42,8 @@ enum class Axis { X, D };
 
 // JetForge (Added Scientific) trigger bits — verified against custom printer
 // wiring; recheck if the test-rig Galil extension I/O is wired differently.
-#define MJ_START_BIT  23   // pin 18 on the custom printer
-#define MJ_DIR_BIT    22   // pin 32 on the custom printer
+#define MJ_START_BIT  18   // pin 18 on the custom printer
+#define MJ_DIR_BIT    32   // pin 32 on the custom printer
 
 // ── CMD namespace ────────────────────────────────────────────────────────────
 // Builds Galil DMC program strings.  Each function returns a single line in
