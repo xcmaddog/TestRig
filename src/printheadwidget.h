@@ -39,6 +39,8 @@
 #include <QWidget>
 #include <QStringList>
 
+#include "printer.h"
+
 class QPlainTextEdit;
 class QLineEdit;
 class QPushButton;
