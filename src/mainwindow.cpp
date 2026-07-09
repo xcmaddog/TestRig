@@ -346,11 +346,24 @@ QWidget *MainWindow::horizontalLine()
 
 void MainWindow::setAxesTabEnabled(bool enabled)
 {
-    for (auto *w : {static_cast<QWidget*>(m_xRightBtn),  m_xLeftBtn,
-                    m_xHomeBtn, m_xEnableBtn, m_xAbsMoveBtn,
-                    m_dUpBtn, m_dDownBtn,
-                    m_dHomeBtn, m_dEnableBtn, m_dAbsMoveBtn})
-        if (w) w->setEnabled(enabled);
+    const QList<QWidget*> widgets = {
+        m_xRightBtn,
+        m_xLeftBtn,
+        m_xHomeBtn,
+        m_xEnableBtn,
+        m_xAbsMoveBtn,
+        m_dUpBtn,
+        m_dDownBtn,
+        m_dHomeBtn,
+        m_dEnableBtn,
+        m_dAbsMoveBtn
+    };
+
+    for (QWidget *w : widgets)
+    {
+        if (w)
+            w->setEnabled(enabled);
+    }
 }
 
 void MainWindow::updateAxisStatus()
