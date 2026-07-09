@@ -153,4 +153,11 @@ install(TARGETS TestRig
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# ── Runtime library paths ─────────────────────────────────────────────────────
+if(HAS_IDS_PEAK)
+    set_target_properties(TestRig PROPERTIES
+        BUILD_RPATH "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64/lib/aarch64-linux-gnu"
+    )
+endif()
+
 qt_finalize_executable(TestRig)
