@@ -33,45 +33,39 @@ find_library(GCLIB_LIB
 
 # ── IDS peak SDK ─────────────────────────────────────────────────────────────
 
-option(WITH_IDS_PEAK "Build with IDS peak camera support" ON)
+set(IDS_PEAK_ROOT "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64"
+    CACHE PATH "IDS peak SDK root")
 
-if(WITH_IDS_PEAK)
+set(IDS_PEAK_INCLUDE_DIR
+    "${IDS_PEAK_ROOT}/include/ids-peak")
 
-    set(IDS_PEAK_ROOT "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64"
-        CACHE PATH "IDS peak SDK root")
+set(IDS_PEAK_COMMON_INCLUDE_DIR
+    "${IDS_PEAK_ROOT}/include")
 
-    set(IDS_PEAK_INCLUDE
-        "${IDS_PEAK_ROOT}/include/ids-peak")
+set(IDS_PEAK_LIB_DIR
+    "${IDS_PEAK_ROOT}/lib/aarch64-linux-gnu")
 
-    set(IDS_PEAK_IPL_INCLUDE
-        "${IDS_PEAK_ROOT}/include/ids-peak")
+find_path(IDS_PEAK_HEADER
+    peak/peak.hpp
+    PATHS "${IDS_PEAK_INCLUDE_DIR}"
+    REQUIRED
+)
 
-    set(IDS_PEAK_LIB_DIR
-        "${IDS_PEAK_ROOT}/lib/aarch64-linux-gnu")
+find_library(IDS_PEAK_LIB
+    NAMES ids_peak
+    PATHS "${IDS_PEAK_LIB_DIR}"
+    REQUIRED
+)
 
-    find_library(IDS_PEAK_LIB
-        NAMES ids_peak
-        PATHS "${IDS_PEAK_LIB_DIR}"
-    )
+find_library(IDS_PEAK_IPL_LIB
+    NAMES ids_peak_ipl
+    PATHS "${IDS_PEAK_LIB_DIR}"
+    REQUIRED
+)
 
-    find_library(IDS_PEAK_IPL_LIB
-        NAMES ids_peak_ipl
-        PATHS "${IDS_PEAK_LIB_DIR}"
-    )
-
-    if(IDS_PEAK_LIB AND IDS_PEAK_IPL_LIB)
-        message(STATUS "IDS peak SDK found at ${IDS_PEAK_ROOT}")
-        set(HAS_IDS_PEAK TRUE)
-    else()
-        message(WARNING
-            "IDS peak SDK not found at ${IDS_PEAK_ROOT}. "
-            "Camera support will be disabled at runtime.")
-        set(HAS_IDS_PEAK FALSE)
-    endif()
-
-else()
-    set(HAS_IDS_PEAK FALSE)
-endif()
+message(STATUS "IDS peak SDK found at ${IDS_PEAK_ROOT}")
+message(STATUS "  IDS peak library: ${IDS_PEAK_LIB}")
+message(STATUS "  IDS peak IPL library: ${IDS_PEAK_IPL_LIB}")
 
 # ── Sources ───────────────────────────────────────────────────────────────────
 set(PROJECT_SOURCES
@@ -124,14 +118,10 @@ target_include_directories(TestRig PRIVATE
     "${GCLIB_INCLUDE_DIR}"
 )
 
-if(HAS_IDS_PEAK)
-    target_include_directories(TestRig PRIVATE
-        "${IDS_PEAK_INCLUDE}"
-        "${IDS_PEAK_IPL_INCLUDE}"
-        "${IDS_PEAK_ROOT}/common/include"
-    )
-    target_compile_definitions(TestRig PRIVATE HAS_IDS_PEAK)
-endif()
+target_include_directories(TestRig PRIVATE
+    "${IDS_PEAK_INCLUDE_DIR}"
+    "${IDS_PEAK_COMMON_INCLUDE_DIR}"
+)
 
 # ── Link libraries ────────────────────────────────────────────────────────────
 target_link_libraries(TestRig PRIVATE
@@ -140,12 +130,10 @@ target_link_libraries(TestRig PRIVATE
     "${GCLIB_LIB}"
 )
 
-if(HAS_IDS_PEAK)
-    target_link_libraries(TestRig PRIVATE
-        "${IDS_PEAK_LIB}"
-        "${IDS_PEAK_IPL_LIB}"
-    )
-endif()
+target_link_libraries(TestRig PRIVATE
+    "${IDS_PEAK_LIB}"
+    "${IDS_PEAK_IPL_LIB}"
+)
 
 # ── Install ───────────────────────────────────────────────────────────────────
 include(GNUInstallDirs)
@@ -159,5 +147,9 @@ if(HAS_IDS_PEAK)
         BUILD_RPATH "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64/lib/aarch64-linux-gnu"
     )
 endif()
+
+set_target_properties(TestRig PROPERTIES
+    BUILD_RPATH "${IDS_PEAK_LIB_DIR}"
+)
 
 qt_finalize_executable(TestRig)
