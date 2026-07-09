@@ -32,34 +32,31 @@ find_library(GCLIB_LIB
 )
 
 # ── IDS peak SDK ─────────────────────────────────────────────────────────────
-# IDS peak for ARM64 Linux.  Default install path from the IDS installer:
-#   /opt/ids/peak
-# Override with -DIDS_PEAK_ROOT=... if installed elsewhere.
-#
-# If IDS peak is NOT installed, set -DWITH_IDS_PEAK=OFF to build without the
-# camera tab.  The tab will still compile but reports "camera unavailable" at
-# runtime if IDS peak libraries are absent.  (See cameracontroller.cpp.)
-#
-# By default we try to find it and include it; the build won't fail if the
-# SDK is not present (the camera code is guarded at runtime, not compile time).
 
 option(WITH_IDS_PEAK "Build with IDS peak camera support" ON)
 
 if(WITH_IDS_PEAK)
-    set(IDS_PEAK_ROOT "/opt/ids/peak" CACHE PATH "IDS peak SDK root")
 
-    set(IDS_PEAK_INCLUDE     "${IDS_PEAK_ROOT}/generic_sdk/api/include")
-    set(IDS_PEAK_IPL_INCLUDE "${IDS_PEAK_ROOT}/generic_sdk/ipl/include")
-    set(IDS_PEAK_LIB_DIR     "${IDS_PEAK_ROOT}/generic_sdk/api/lib/aarch64")
-    set(IDS_PEAK_IPL_LIB_DIR "${IDS_PEAK_ROOT}/generic_sdk/ipl/lib/aarch64")
+    set(IDS_PEAK_ROOT "/opt/ids/ids-peak-with-ueyetl_26.06-720_arm64"
+        CACHE PATH "IDS peak SDK root")
+
+    set(IDS_PEAK_INCLUDE
+        "${IDS_PEAK_ROOT}/include/ids-peak")
+
+    set(IDS_PEAK_IPL_INCLUDE
+        "${IDS_PEAK_ROOT}/include/ids-peak")
+
+    set(IDS_PEAK_LIB_DIR
+        "${IDS_PEAK_ROOT}/lib/aarch64-linux-gnu")
 
     find_library(IDS_PEAK_LIB
         NAMES ids_peak
         PATHS "${IDS_PEAK_LIB_DIR}"
     )
+
     find_library(IDS_PEAK_IPL_LIB
         NAMES ids_peak_ipl
-        PATHS "${IDS_PEAK_IPL_LIB_DIR}"
+        PATHS "${IDS_PEAK_LIB_DIR}"
     )
 
     if(IDS_PEAK_LIB AND IDS_PEAK_IPL_LIB)
@@ -68,10 +65,10 @@ if(WITH_IDS_PEAK)
     else()
         message(WARNING
             "IDS peak SDK not found at ${IDS_PEAK_ROOT}. "
-            "Camera support will be disabled at runtime. "
-            "Set -DIDS_PEAK_ROOT=/path/to/sdk to fix, or -DWITH_IDS_PEAK=OFF to suppress.")
+            "Camera support will be disabled at runtime.")
         set(HAS_IDS_PEAK FALSE)
     endif()
+
 else()
     set(HAS_IDS_PEAK FALSE)
 endif()
