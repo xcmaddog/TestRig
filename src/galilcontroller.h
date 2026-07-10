@@ -12,8 +12,9 @@
 // ── Thread safety ─────────────────────────────────────────────────────────
 //   All public methods must be called from the GUI thread.
 //   The polling timer runs on the GUI thread (QTimer, not a QThread).
-//   downloadAndRun() calls GProgramDownload + GCmd("XQ") synchronously;
-//   these return quickly (< 1 ms).  GProgramComplete is NOT called here —
+//   downloadAndRun() calls gclib_set_program + gclib_command("XQ") synchronously;
+//   these return quickly (< 1 ms).  There is no blocking "wait for motion
+//   complete" call here —
 //   the polling timer detects motion end and emits axisIdle().
 
 #ifndef GALILCONTROLLER_H
@@ -121,10 +122,10 @@ public:
     // ── Raw handle ────────────────────────────────────────────────────────
     //
     // Exposed for the rare cases where a caller needs to call gclib functions
-    // directly (e.g. GProgramDownload in the printhead widget).
+    // directly (e.g. gclib_set_program in the printhead widget).
     // Do not cache this pointer across connect/disconnect cycles.
 
-    GCon gcHandle() const { return m_handle; }
+    gclib_handle gcHandle() const { return m_handle; }
 
 signals:
     void connected();
@@ -142,9 +143,9 @@ private:
     long        toSteps(Axis axis, double mm) const;
     double      toMm(Axis axis, long steps) const;
     double      queryDouble(const QString &mgExpr) const;
-    void        emitError(const QString &context, GReturn rc);
+    void        emitError(const QString &context);
 
-    GCon    m_handle     = nullptr;
+    gclib_handle m_handle = nullptr;
     QTimer *m_pollTimer  = nullptr;
 
     // Cached state updated by pollStatus()

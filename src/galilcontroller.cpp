@@ -1,7 +1,6 @@
 #include "galilcontroller.h"
 
 #include <gclib.h>
-#include <gclibo.h>
 
 #include <cstring>
 #include <sstream>
@@ -63,18 +62,16 @@ double GalilController::queryDouble(const QString &mgExpr) const
 {
     if (!m_handle) return 0.0;
     char buf[BUF_SIZE] = {};
-    GReturn rc = GCommand(m_handle,
-                          ("MG " + mgExpr).toLocal8Bit().constData(),
-                          buf, sizeof(buf), nullptr);
-    if (rc != G_NO_ERROR) return 0.0;
+    gclib_result rc = gclib_command(m_handle,
+                                    ("MG " + mgExpr).toLocal8Bit().constData(),
+                                    buf, sizeof(buf));
+    if (rc != GCLIB_SUCCESS) return 0.0;
     return QString(buf).trimmed().toDouble();
 }
 
-void GalilController::emitError(const QString &context, GReturn rc)
+void GalilController::emitError(const QString &context)
 {
-    char errBuf[BUF_SIZE] = {};
-    GError(rc, errBuf, sizeof(errBuf));
-    m_lastError = QString("%1: %2").arg(context, errBuf);
+    m_lastError = QString("%1: %2").arg(context, gclib_error(m_handle));
     emit errorOccurred(m_lastError);
 }
 
@@ -86,10 +83,10 @@ bool GalilController::connect(const QString &address)
 {
     if (m_handle) disconnect();
 
-    GReturn rc = GOpen(address.toLocal8Bit().constData(), &m_handle);
-    if (rc != G_NO_ERROR)
+    gclib_result rc = gclib_open(&m_handle, address.toLocal8Bit().constData());
+    if (rc != GCLIB_SUCCESS)
     {
-        emitError("GOpen", rc);
+        emitError("gclib_open");
         m_handle = nullptr;
         return false;
     }
@@ -104,8 +101,8 @@ void GalilController::disconnect()
 {
     if (!m_handle) return;
     m_pollTimer->stop();
-    GClose(m_handle);
-    m_handle = nullptr;
+    gclib_close(&m_handle);   // gclib_close nulls m_handle itself on success
+    m_handle = nullptr;       // belt-and-suspenders in case it fails and leaves handle non-null
     emit disconnected();
 }
 
@@ -122,12 +119,12 @@ bool GalilController::sendCommand(const QString &cmd, QString *response)
     }
 
     char buf[BUF_SIZE] = {};
-    GReturn rc = GCommand(m_handle,
-                          cmd.toLocal8Bit().constData(),
-                          buf, sizeof(buf), nullptr);
-    if (rc != G_NO_ERROR)
+    gclib_result rc = gclib_command(m_handle,
+                                    cmd.toLocal8Bit().constData(),
+                                    buf, sizeof(buf));
+    if (rc != GCLIB_SUCCESS)
     {
-        emitError(QString("Command \"%1\"").arg(cmd), rc);
+        emitError(QString("Command \"%1\"").arg(cmd));
         return false;
     }
 
@@ -263,19 +260,19 @@ bool GalilController::downloadAndRun(const std::string &dmcProgram)
 
     // Abort any running program / motion before downloading.
     char buf[BUF_SIZE] = {};
-    GCommand(m_handle, "AB", buf, sizeof(buf), nullptr);
+    gclib_command(m_handle, "AB", buf, sizeof(buf));
 
-    GReturn rc = GProgramDownload(m_handle, dmcProgram.c_str(), "");
-    if (rc != G_NO_ERROR)
+    gclib_result rc = gclib_set_program(m_handle, dmcProgram.c_str(), "");
+    if (rc != GCLIB_SUCCESS)
     {
-        emitError("GProgramDownload", rc);
+        emitError("gclib_set_program");
         return false;
     }
 
-    rc = GCommand(m_handle, "XQ", buf, sizeof(buf), nullptr);
-    if (rc != G_NO_ERROR)
+    rc = gclib_command(m_handle, "XQ", buf, sizeof(buf));
+    if (rc != GCLIB_SUCCESS)
     {
-        emitError("XQ", rc);
+        emitError("XQ");
         return false;
     }
 
@@ -290,7 +287,7 @@ bool GalilController::downloadAndRun(const std::string &dmcProgram)
 bool GalilController::setSolenoid(bool on)
 {
     return sendCommand(on ? QString("SB %1").arg(SOLENOID_BIT)
-                           : QString("CB %1").arg(SOLENOID_BIT));
+                          : QString("CB %1").arg(SOLENOID_BIT));
 }
 
 bool GalilController::quickPurge(int pulseMs)
