@@ -4,7 +4,8 @@
 ; This file is downloaded to the controller's non-volatile memory.  To update
 ; it, connect with Galil Composer (or telnet) and use:
 ;
-;   gprogramdownload  (gclib call)   — from the GUI's "Upload Program" button
+;   gclib_set_program()  (gclib call)   — from the GUI's "Upload Program" button
+;   BP              — burn program to non-volatile memory (see note below)
 ;   RS              — hardware reset the controller
 ;
 ; ── What this program does ────────────────────────────────────────────────────
@@ -31,8 +32,20 @@
 ;   to them; the controller will report an error.
 ; ============================================================================
 
+; ── Solenoid I/O ───────────────────────────────────────────────────────────
+;   Port 22 drives the ink solenoid MOSFET gate.  This pin rests HIGH before
+;   any Galil code runs (confirmed by measuring it powered but pre-#AUTO), so
+;   CB 22 here only forces it low from the moment #AUTO executes onward — it
+;   does NOT cover the brief window between power-on and #AUTO starting.
+;   TEMPORARY: current driver stage is an N-type MOSFET, so "port high" energizes
+;   the solenoid during that pre-#AUTO window. Fix pending: swap to a P-type
+;   (high-side) MOSFET so "high" reads as off at the hardware level too. Once
+;   that swap is done, replace CB 22 below with SB 22, or remove the line
+;   entirely if the new driver's idle-high state alone is sufficient.
+; ============================================================================
+
 #AUTO
-CB 22   ; Solenoid (quick purge)
+CB 22   ; Solenoid off (see note above — software-only fix until MOSFET swap)
 MTA=2   ; Axis A (X carriage): stepper, active-low step
 MTD=2   ; Axis D (reservoir):  stepper, active-low step
 SHA     ; Enable X-axis motor on boot
