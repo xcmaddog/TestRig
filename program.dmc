@@ -45,7 +45,7 @@
 ; ============================================================================
 
 #AUTO
-CB 22   ; Solenoid off (see note above — software-only fix until MOSFET swap)
+CB 22   ; Solenoid off (see note above. Software-only fix until MOSFET swap)
 MTA=2   ; Axis A (X carriage): stepper, active-low step
 MTD=2   ; Axis D (reservoir):  stepper, active-low step
 SHA     ; Enable X-axis motor on boot
