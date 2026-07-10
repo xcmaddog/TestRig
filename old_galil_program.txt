@@ -1,0 +1,25 @@
+This is the code that used to be burnt onto the Galil. 
+It contains what appears to be some kind of print-head 
+jetting path-following routine, X/Y motion with jet 
+triggering on axis H.
+
+
+0 #AUTO;MTX=2;MTY=2;EN
+1 #BEGIN;yCnt=800;xCnt=1000;DMData[11];JS#fill("Data",0)
+2 #DATA_WT
+3 #LOOP;WT100;begin=Data[0];JP#LOOP,begin=0;JP#STOP,begin=2;JS#PRINT;Data[0]=0
+4 JP#DATA_WT
+5 #STOP;SPX=60*xCnt;SPY=40*yCnt;PAX=150*xCnt;PAY=0;BGXY;AM;EN
+6 #PRINT;strtX=Data[1];strtY=Data[2];numLs=Data[3];lSpce=Data[4];lDist=Data[5]
+7 dSpce=Data[6];jetHz=Data[7];pVelc=Data[8];pAccl=Data[9];index=Data[10]
+8 ACX =pAccl;DCX =pAccl;ACY =400*yCnt;DCY =400*yCnt;SHH;ACH =1073740800
+9 DCH =1073740800;accT=pVelc/pAccl;accD =accT*accT*pAccl*0.5;jOffD =accD +lDist
+10 #PRNTL;SPX=80*xCnt;SPY=60*yCnt;PAX=(strtX-accD);PAY=strtY;BGXY;AM;WT100
+11 SPX=pVelc;JGH=jetHz;PRX=lDist+(2.0*accD);BGX;ADX=accD;BGH;ADX=jOffD;STH;AM
+12 strtY=strtY+lSpce;index=index+1;JP#PRNTL,index<numLs;EN
+13 #fill;^c=0
+14 #fill_h;^a[^c]=^b;^c=^c+1;JP#fill_h,(^c<^a[-1]);EN
+15 
+16 ␦:
+17 
+:
