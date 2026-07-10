@@ -120,7 +120,7 @@ void MainWindow::buildGalilBar()
     m_galilConnDot->setFixedSize(14, 14);
     m_galilConnDot->setStyleSheet("background-color: #555; border-radius: 7px;");
 
-    m_galilAddressEdit = new QLineEdit("192.168.42.100 -d", this);
+    m_galilAddressEdit = new QLineEdit("192.168.42.100", this);
     m_galilAddressEdit->setFixedWidth(200);
     m_galilAddressEdit->setToolTip(
         "gclib connection string.  Format: <IP> <flags>\n"
