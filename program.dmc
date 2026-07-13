@@ -48,6 +48,7 @@
 CB 22;    'Solenoid off
 MTA=2;    'Axis A (X carriage): stepper, active-low step
 MTD=2;    'Axis D (reservoir):  stepper, active-low step
+CN 1;     'Limit Switch Polarity: active high
 SHA;      'Enable X-axis motor on boot
 SHD;      'Enable D-axis motor on boot
 EN

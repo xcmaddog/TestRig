@@ -15,7 +15,7 @@ getting skipped.
 import socket
 import time
 
-GALIL_IP = "192.168.42.100"
+GALIL_IP = "192.168.42.64"
 GALIL_PORT = 23
 PROGRAM_PATH = "/home/testrig/Documents/TestStation/program.dmc"
 LINE_DELAY_S = 0.05   # bumped up from 0.02 for margin; lower if this feels slow
