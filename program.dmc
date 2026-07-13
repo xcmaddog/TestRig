@@ -45,7 +45,7 @@
 ; ============================================================================
 
 #AUTO
-CO 15     'Set all extended I/O to output
+CO 15;    'Set all extended I/O to output
 CB 22;    'Solenoid off
 MTA=2;    'Axis A (X carriage): stepper, active-low step
 MTD=2;    'Axis D (reservoir):  stepper, active-low step
